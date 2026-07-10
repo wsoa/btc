@@ -1,0 +1,338 @@
+/* Base reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body font and base sizing */
+body {
+    min-height: 100vh;
+    font-family: 'Raleway', Arial, sans-serif;
+}
+
+/* Main layout */
+main {
+    display: flex;
+    max-width: 1920px;
+    min-height: 100vh;
+}
+
+/* Section 1 (form) */
+main>section:nth-of-type(1) {
+    background: rgb(248, 248, 248);
+    width: 33vw;
+    max-width: calc(.33 * 1440px);
+    min-width: 451px;
+    padding: 70px 32px 16px 60px;
+}
+
+/* Input row for grouped inputs (section 1 and assumptions) */
+.input-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.input-row>div {
+    flex: 1 1 0;
+}
+
+/* Label and input styling */
+label {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 16px 0 8px 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 21px;
+    color: rgb(120, 120, 120);
+}
+
+input,
+select {
+    font-family: sans-serif;
+    font-weight: 700;
+    box-sizing: border-box;
+    height: 60px;
+    color: rgb(35, 37, 38);
+    border: 1px solid rgb(229, 231, 235);
+    border-radius: 21px;
+    padding-left: 16px;
+    font-size: 18px;
+    width: 100%;
+    margin-top: 8px;
+}
+
+input:disabled {
+    background-color: white;
+}
+
+/* Single row inputs (expenses, purchases) */
+main>section:nth-of-type(1)>div:not(.input-row) label {
+    margin: 16px 0 8px 0;
+}
+
+/* Typography */
+h1 {
+    font-size: 30px;
+    line-height: 36px;
+    color: rgb(35, 37, 38);
+}
+
+h2 {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 33px;
+    padding: 40px 0 12px 0;
+    color: rgb(35, 37, 38);
+}
+
+h3 {
+    font-size: 20px;
+    font-weight: 400;
+    padding-top: 5px;
+    line-height: 32px;
+}
+
+p {
+    font-size: 14px;
+    padding: 12px 0 0 0;
+    line-height: 21px;
+    font-weight: 400;
+}
+
+summary {
+    display: flex;
+    list-style: none;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 24px;
+    color: rgb(120, 120, 120);
+}
+
+summary::after {
+    align-self: center;
+    content: '';
+    width: 18px;
+    height: 10px;
+    background: url('../images/angle-down.svg');
+    background-size: cover;
+    margin-left: .75em;
+    transition: .42s;
+    transform: scaleY(-1);
+}
+
+details[open]>summary::after {
+    transform: scaleY(1);
+}
+
+/* Section 2 (stat cards area) */
+main>section:nth-of-type(2) {
+    background: #FFF;
+    width: 67vw;
+    min-width: 552px;
+    max-width: calc(.67 * 1440px);
+    padding: 70px 32px 16px 32px;
+}
+
+.stat-cards {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5em;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid rgb(229, 231, 235);
+    border-radius: 21px;
+    padding: 18px;
+    font-size: 28px;
+    width: 275px;
+    background: white;
+}
+
+.stat-card img {
+    width: 30px;
+    height: 30px;
+}
+
+.stat-card figcaption>div {
+    display: flex;
+    align-items: baseline;
+    line-height: 42px;
+}
+
+.stat-card figcaption>div>h3 {
+    font-family: sans-serif;
+    font-size: 28px;
+}
+
+.stat-card figcaption>div>h3:nth-of-type(2) {
+    padding: 5px 8px 0 8px;
+    font-weight: 700;
+}
+
+.stat-card figcaption>div>h3:nth-of-type(1) {
+    color: #f7931a;
+    font-weight: 700;
+}
+
+.stat-card figcaption>div>span {
+    font-size: 16px;
+    align-items: center;
+    padding: 5px 0 0 4px;
+}
+
+/* Details (assumptions) section input rows */
+details {
+    margin-top: 57px;
+}
+
+details .input-row {
+    margin-top: 0px;
+}
+
+.section2-chart {
+    display: flex;
+    box-sizing: border-box;
+    justify-content: center;
+    border-radius: 21px;
+    border: solid 1px rgb(229, 231, 235);
+    padding: 16px 16px 16px 16px;
+    /* height: 400px; */
+    & canvas {
+        height: 400px;
+    }
+
+}
+
+.explanation {
+    margin-top: 32px;
+}
+
+.explanation h2 {
+    padding-top: 0;
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.explanation p {
+    padding-top: 0;
+    margin-top: 0;
+    margin-bottom: 16px;
+    line-height: 24px;
+    line-height: normal;
+    font-size: 16px;
+    text-size-adjust: 100%;
+    color: rgb(75, 85, 99);
+}
+
+.explanation ol {
+    margin-left: 16px;
+    padding-left: 16px;
+    color: rgb(75, 85, 99);
+
+    & span {
+        font-weight: 600;
+    }
+
+    & li {
+        margin-top: 8px;
+        line-height: 24px;
+    }
+}
+
+/* Responsive tweak for smaller screens (optional, but recommended) */
+@media (max-width: 1000px) {
+    main {
+        flex-direction: column;
+    }
+
+    main>section:nth-of-type(1),
+    main>section:nth-of-type(2) {
+        width: 100vw;
+        max-width: none;
+        min-width: 0;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+
+    .stat-cards {
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+    }
+}
+
+table {
+    width: 100%;
+    margin-top: 32px;
+    border-collapse: collapse;
+    color: rgb(75, 85, 99);
+}
+
+th {
+    padding: 12px 24px 12px 24px;
+    background-color: rgb(249, 250, 251);
+    font-size: 14px;
+    line-height: 20px;
+    height: 84px;
+
+}
+
+tr {
+    border-bottom: 1px solid rgb(229, 231, 235);
+}
+
+tr:last-child {
+    border-bottom: 0px;
+}
+
+td {
+    padding: 16px 24px;
+    text-align: center;
+    /* border: 1px solid black; */
+}
+
+
+.retirement-row {
+    background-color: rgba(247, 147, 26, 0.21);
+}
+
+#calculation-outputs {
+    box-sizing: border-box;
+    margin-top: 32px;
+    padding: 8px;
+    border: 1px solid rgb(229, 231, 235);
+    border-radius: 21px;
+
+    & h2 {
+        padding: 8px 16px 0px 16px;
+    }
+}
+
+canvas {
+    /* width: 850px; */
+}
+/* ------------------------------------------------------------------
+   Retirement verdict ("Is my BTC stack enough to retire?")
+   id-scoped so it overrides the orange .stat-card h3:nth-of-type(1) rule
+------------------------------------------------------------------ */
+#retirement-verdict.verdict-yes {
+    color: #1a9e4b;
+}
+
+#retirement-verdict.verdict-no {
+    color: #c0392b;
+}
+
+.verdict-note {
+    font-size: 13px;
+    line-height: 18px;
+    color: rgb(120, 120, 120);
+    padding-top: 6px;
+}

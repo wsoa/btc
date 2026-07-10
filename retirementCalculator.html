@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/styles/retCalc.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>Semantic HTML Test</title>
+</head>
+
+<body>
+    <main>
+        <section>
+            <hgroup>
+                <h1>Bitcoin</h1>
+                <h3>Retirement Calculator</h3>
+            </hgroup>
+            <h2>Do you have enough BTC to retire?</h2>
+            <div class="input-row">
+                <div>
+                    <label>
+                        Your current age
+                        <input type="text" id="current-age" value="38">
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Your current BTC stack
+                        <input type="text" name="" id="btc-stack" value=".5000">
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label>
+                    Your ideal monthly expenses during retirement
+                    <input type="text" id="monthly-expenses" value="20,000">
+                </label>
+            </div>
+            <div>
+                <label>
+                    Your monthly BTC purchases in USD
+                    <input type="text" id="monthly-purchase" value="1,000">
+                </label>
+            </div>
+            <details>
+                <summary>
+                    Assumptions
+                </summary>
+                <div class="input-row">
+                    <div>
+                        <label>
+                            Retirement age
+                            <input type="text" name="" id="retirement-age" value="68">
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Life expectancy age
+                            <input type="text" id="life-expectancy-age" value="85">
+                        </label>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div>
+                        <label>
+                            Annual inflation
+                            <input type="text" id="annual-inflation" value="5">
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            BTC forecast model
+                            <select name="" id="prediction-model">
+                                <option value="0">Saylor's Bear</option>
+                                <option value="1" selected>Saylor's Base</option>
+                                <option value="2">Saylor's Bull</option>
+                                <option value="3">Power Law</option>
+                                <option value="4">Linear Growth</option>
+                                <option value="5">Exponential Growth</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div>
+                        <label>
+                            Withdrawal strategy
+                            <select name="" id="sell-strategy">
+                                <option value="optimized" selected>Optimized &mdash; sell only what you need</option>
+                                <option value="conservative">Conservative &mdash; sell all at retirement</option>
+                                <option value="cyclical">Cyclical &mdash; sell every 4 years</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div id="input-row">
+                    <div>
+                        <label for="">
+                            Current BTC Price
+                            <input type="text" name="" id="btc-price" value="106,000">
+                        </label>
+                    </div>
+                    <div>
+                        <label for="">
+                            <span>Updated CAGR</span>
+                            <input type="text" name="" id="updated-cagr" value="1.0000" disabled>
+                        </label>
+                    </div>
+                </div>
+            </details>
+        </section>
+        <section>
+            <div class="stat-cards">
+                <figure class="stat-card">
+                    <img src="static/images/bitcoin-circle.svg" alt="">
+                    <figcaption>
+                        <p>Current BTC portfolio value</p>
+                        <div>
+                            <h3>$</h3>
+                            <h3 id="portfolio-value">52,198</h3>
+                            <span>USD</span>
+                        </div>
+                    </figcaption>
+                </figure>
+                <figure class="stat-card">
+                    <img src="static/images/line-chart-dots-circle.svg" alt="">
+                    <figcaption>
+                        <p>Portfolio balance at age <span name="retirement-age">65</span> </p>
+                        <div>
+                            <h3>$</h3>
+                            <h3 id="retirement-value">52,198</h3>
+                            <span>USD</span>
+                        </div>
+                    </figcaption>
+                </figure>
+                <figure class="stat-card">
+                    <img src="static/images/question-circle.svg" alt="">
+                    <figcaption>
+                        <p>Is my BTC stack enough to retire?</p>
+                        <div>
+                            <h3 id="retirement-verdict" class="verdict-yes">Yes</h3>
+                        </div>
+                        <p id="verdict-note" class="verdict-note"></p>
+                    </figcaption>
+                </figure>
+            </div>
+            <figure class="section2-chart">
+                <div>
+                    <canvas role="img" id="myChart"></canvas>
+                </div>
+            </figure>
+            <div class="explanation">
+                <h2>How This Calculator Works</h2>
+                <p> This Bitcoin retirement calculator helps you check whether your current BTC holdings and monthly BTC
+                    investment is enough to retire for the future using the following inputs:</p>
+                <ol>
+                    <li>
+                        <span>Your Current Age & BTC Stack:</span>
+                        It starts with your age today and the Bitcoin you currently hold.
+                    </li>
+                    <li>
+                        <span>BTC Price Growth:</span>
+                        The forecasted Bitcoin price is projected using your chosen forecast model (Saylor
+                        Bear/Base/Bull, <a href="https://x.com/Giovann35084111?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+                            class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">power
+                            law</a>, or a custom CAGR).
+                    </li>
+                    <li>
+                        <span>Monthly BTC Investment:</span>
+                        We assume you dollar cost average by buying Bitcoin monthly and therefore increasing your
+                        Bitcoin holdings until retirement. We also assume you stop investing in more Bitcoin when you
+                        retire.
+                    </li>
+                    <li>
+                        <span>Retirement Expenses:</span>
+                        Based on your ideal monthly expenses at retirement, we sell enough Bitcoin each month to cover
+                        those costs (or, depending on your chosen withdrawal strategy, sell in larger chunks). These
+                        monthly expenses grow at the inflation rate assumption which you can change in the Assumptions
+                        dropdown section.
+                    </li>
+                    <li>
+                        <span>Withdrawal Strategy:</span>
+                        Optimized sells only the BTC you need each month. Conservative sells your whole stack to cash at
+                        retirement. Cyclical sells in chunks every few years. You can switch strategies in the
+                        Assumptions section.
+                    </li>
+                    <li>
+                        <span>Retirement Check:</span>
+                        Finally, the calculator simulates every month from today to your life expectancy age and reports
+                        whether your Bitcoin stack survives the full drawdown &mdash; and, if not, roughly what age it
+                        runs out.
+                    </li>
+                </ol>
+            </div>
+            <section id="calculation-outputs">
+                <h2>Detailed Calculations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Year</th>
+                            <th>Age</th>
+                            <th>BTC Price Forecast</th>
+                            <th>BTC Holdings</th>
+                            <th>BTC Holdings Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.1/dist/chartjs-plugin-annotation.min.js"></script>
+
+    <script src="static/js/site.js"></script>
+</body>
+
+</html>
