@@ -585,11 +585,19 @@ document.querySelectorAll(
     input.addEventListener('change', calculateAndRender);
 });
 
-// Reformat the BTC stack field with thousands separators once the user
-// leaves it, mirroring how #btc-price / #monthly-expenses ship pre-formatted.
-document.getElementById('btc-stack').addEventListener('blur', function () {
-    const num = parseFloat(stripCommas(this.value));
-    if (!isNaN(num)) {
-        this.value = num.toLocaleString(undefined, { maximumFractionDigits: 8 });
-    }
-});
+// Reformat currency/quantity fields with thousands separators once the user
+// leaves them (they ship pre-formatted, but typing overwrites that).
+function formatFieldWithCommas(id, maximumFractionDigits) {
+    const el = document.getElementById(id);
+    el.addEventListener('blur', function () {
+        const num = parseFloat(stripCommas(this.value));
+        if (!isNaN(num)) {
+            this.value = num.toLocaleString(undefined, { maximumFractionDigits });
+        }
+    });
+}
+
+formatFieldWithCommas('btc-stack', 8);
+formatFieldWithCommas('btc-price', 0);
+formatFieldWithCommas('monthly-expenses', 0);
+formatFieldWithCommas('monthly-purchase', 0);
