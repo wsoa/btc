@@ -462,6 +462,7 @@ function renderChart(ages, portfolioValues, retirementAge) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     type: 'category',
