@@ -80,15 +80,13 @@ function daysSinceGenesis(date) {
 }
 
 // Read the user-entered CAGR for the Linear / custom-CAGR model.
-// Convention (kept from the original): "30%" -> 0.30, or a bare decimal
-// like "0.30" -> 0.30. A bare "30" would mean 3000% — type "30%" instead.
+// This field is a PERCENTAGE: "15" and "15%" both mean 15% (0.15).
+// (Note: "0.15" now means 0.15%, not 15% — type whole percents.)
 function readUserCagr() {
     const el = document.getElementById("updated-cagr");
-    const raw = (el ? el.value : "").toString().trim();
-    let parsed;
-    if (raw.includes('%')) parsed = parseFloat(raw.replace('%', '')) / 100;
-    else parsed = parseFloat(raw);
-    return isNaN(parsed) ? 0 : parsed;
+    const raw = (el ? el.value : "").toString().trim().replace('%', '');
+    const parsed = parseFloat(raw);
+    return isNaN(parsed) ? 0 : parsed / 100;
 }
 
 /* ----------------------------------------------------------------
@@ -145,8 +143,11 @@ function buildMonthlyPrices(currentAge, lifeExpectancyAge, currentBtcPrice, pred
 /* ----------------------------------------------------------------
    THE SIMULATION ENGINE (monthly)
 ---------------------------------------------------------------- */
-function runSimulation(p) {
-    const prices = buildMonthlyPrices(
+function runSimulation(p, precomputedPrices) {
+    // The price path depends only on current age, life expectancy, current
+    // price and model — NOT on retirement age — so the solver can build it
+    // once and hand the same array to every candidate age.
+    const prices = precomputedPrices || buildMonthlyPrices(
         p.currentAge, p.lifeExpectancyAge, p.currentBtcPrice, p.predictionModel
     );
     const totalMonths = prices.length - 1;
@@ -174,6 +175,7 @@ function runSimulation(p) {
     for (let m = 0; m <= totalMonths; m++) {
         const price = prices[m];
         const retired = m >= retirementMonth;
+        const income = expenseAt(m); // this month's withdrawal (0 before retirement)
 
         // Cash earns yield (no-op when yield = 0).
         if (cash > 0 && monthlyCashYield !== 0) cash *= (1 + monthlyCashYield);
@@ -185,7 +187,7 @@ function runSimulation(p) {
 
         // --- Drawdown: fund expenses in retirement ---
         if (retired) {
-            const need = expenseAt(m);
+            const need = income;
 
             if (p.sellStrategy === "conservative") {
                 // Liquidate the entire stack to cash at retirement, spend from cash.
@@ -231,6 +233,7 @@ function runSimulation(p) {
             price,
             btc,
             cash,
+            income,
             portfolioValue: btc * price + cash,
             retired,
         });
@@ -242,6 +245,26 @@ function runSimulation(p) {
         depletionAge: depletedMonth === null ? null : p.currentAge + depletedMonth / 12,
         retirementMonth,
     };
+}
+
+/* ----------------------------------------------------------------
+   REVERSE SOLVER: earliest age you could retire
+   Holds every input fixed except retirement age, then finds the
+   lowest age whose plan still survives to life expectancy.
+   Sufficiency is monotonic in retirement age (later is always
+   easier), so the first "Yes" scanning upward is the earliest.
+---------------------------------------------------------------- */
+function findEarliestRetirementAge(p, precomputedPrices) {
+    const prices = precomputedPrices || buildMonthlyPrices(
+        p.currentAge, p.lifeExpectancyAge, p.currentBtcPrice, p.predictionModel
+    );
+    // Cap at lifeExpectancy - 1 so we never report "retire the year you die"
+    // (a 0-month retirement is trivially, meaninglessly "sufficient").
+    for (let age = p.currentAge; age <= p.lifeExpectancyAge - 1; age++) {
+        const sim = runSimulation({ ...p, retirementAge: age }, prices);
+        if (sim.sufficient) return age;
+    }
+    return null; // not achievable with these inputs
 }
 
 /* ----------------------------------------------------------------
@@ -259,6 +282,7 @@ function aggregateAnnual(sim, currentYear) {
             age: Math.round(snap.age),
             price: snap.price,
             btc: snap.btc,
+            income: snap.income,
             value: snap.portfolioValue,
         });
     }
@@ -320,7 +344,8 @@ function renderTable(rows, retirementAge, sim, btcStack, currentBtcPrice) {
             <td>${r.age}</td>
             <td>${fmtUSD(r.price)}</td>
             <td>${r.btc.toFixed(4)}</td>
-            <td>${fmtUSD(r.value)}</td>`;
+            <td>${fmtUSD(r.value)}</td>
+            <td>${r.income > 0 ? fmtUSD(r.income) : '—'}</td>`;
         if (r.age === retirementAge) tr.classList.add('retirement-row');
         tbody.appendChild(tr);
     }
@@ -345,6 +370,34 @@ function renderVerdict(sim, lifeExpectancyAge) {
         verdict.classList.add("verdict-no");
         if (note) note.textContent = `Runs out around age ${Math.floor(sim.depletionAge)}.`;
     }
+}
+
+/* ----------------------------------------------------------------
+   RENDER: earliest possible retirement age (with a one-click jump)
+---------------------------------------------------------------- */
+function renderEarliest(earliestAge) {
+    const label = document.getElementById("earliest-label");
+    const btn = document.getElementById("earliest-retire-btn");
+    if (!label || !btn) return;
+
+    if (earliestAge === null) {
+        label.textContent =
+            "No retirement age makes this last — lower expenses, or raise your stack / DCA.";
+        btn.hidden = true;
+        btn.onclick = null;
+        return;
+    }
+
+    label.textContent = "Earliest you could retire:";
+    btn.hidden = false;
+    btn.textContent = "Age " + earliestAge;
+    btn.onclick = () => {
+        const field = document.getElementById("retirement-age");
+        if (field) {
+            field.value = earliestAge;
+            calculateAndRender();
+        }
+    };
 }
 
 /* ----------------------------------------------------------------
@@ -490,17 +543,23 @@ async function calculateAndRender() {
         return;
     }
 
-    const sim = runSimulation({
+    const simParams = {
         currentAge, btcStack, currentBtcPrice, retirementAge, lifeExpectancyAge,
         baseMonthlyExpense: monthlyExpenses, monthlyContribution, annualInflation,
         predictionModel, sellStrategy,
-    });
+    };
+
+    // Build the price path once; reuse it for the chosen-age sim and the solver.
+    const prices = buildMonthlyPrices(currentAge, lifeExpectancyAge, currentBtcPrice, predictionModel);
+    const sim = runSimulation(simParams, prices);
+    const earliestAge = findEarliestRetirementAge(simParams, prices);
 
     const currentYear = new Date().getFullYear();
     const rows = aggregateAnnual(sim, currentYear);
 
     renderTable(rows, retirementAge, sim, btcStack, currentBtcPrice);
     renderVerdict(sim, lifeExpectancyAge);
+    renderEarliest(earliestAge);
     renderChart(rows.map(r => r.age), rows.map(r => r.value), retirementAge);
 }
 

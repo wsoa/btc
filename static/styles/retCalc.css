@@ -309,6 +309,7 @@ td {
     padding: 8px;
     border: 1px solid rgb(229, 231, 235);
     border-radius: 21px;
+    overflow-x: auto;
 
     & h2 {
         padding: 8px 16px 0px 16px;
@@ -335,4 +336,46 @@ canvas {
     line-height: 18px;
     color: rgb(120, 120, 120);
     padding-top: 6px;
+}
+
+/* ------------------------------------------------------------------
+   Earliest-possible-retirement line + "jump to that age" pill button
+------------------------------------------------------------------ */
+.earliest-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 18px;
+    color: rgb(120, 120, 120);
+    padding-top: 8px;
+}
+
+.earliest-btn {
+    /* override the global input/select sizing — this is a small pill */
+    width: auto;
+    height: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 4px 12px;
+    font-family: 'Raleway', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #f7931a;
+    background: #fff;
+    border: 1px solid #f7931a;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+.earliest-btn:hover {
+    background: #f7931a;
+    color: #fff;
+}
+
+.earliest-btn[hidden] {
+    display: none;
 }
