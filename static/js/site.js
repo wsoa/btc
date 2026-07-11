@@ -584,3 +584,12 @@ document.querySelectorAll(
     input.addEventListener('input', calculateAndRender);
     input.addEventListener('change', calculateAndRender);
 });
+
+// Reformat the BTC stack field with thousands separators once the user
+// leaves it, mirroring how #btc-price / #monthly-expenses ship pre-formatted.
+document.getElementById('btc-stack').addEventListener('blur', function () {
+    const num = parseFloat(stripCommas(this.value));
+    if (!isNaN(num)) {
+        this.value = num.toLocaleString(undefined, { maximumFractionDigits: 8 });
+    }
+});
