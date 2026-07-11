@@ -93,6 +93,31 @@ input:disabled {
     pointer-events: none;
 }
 
+/* % suffix wrapper for percentage inputs */
+.input-percent {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.input-percent input {
+    margin-top: 0;
+    padding-right: 32px;
+}
+
+.input-percent-sign {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: rgb(35, 37, 38);
+    pointer-events: none;
+}
+
 /* Single row inputs (expenses, purchases) */
 main>section:nth-of-type(1)>div:not(.input-row) label {
     margin: 16px 0 8px 0;

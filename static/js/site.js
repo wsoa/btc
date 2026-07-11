@@ -295,12 +295,16 @@ function aggregateAnnual(sim, currentYear) {
 function updateCagrField(predictionModel, currentBtcPrice) {
     const el = document.getElementById("updated-cagr");
     if (!el) return;
-    const label = el.parentElement ? el.parentElement.querySelector('span') : null;
+    // el now lives inside the .input-percent wrapper, alongside the label's <span>.
+    const wrapper = el.parentElement;
+    const label = wrapper && wrapper.parentElement ? wrapper.parentElement.querySelector('span') : null;
+    const percentSign = document.getElementById("updated-cagr-percent-sign");
 
     if (predictionModel === "4") {
         el.removeAttribute('disabled');
         el.style.outline = "2px solid rgb(247, 147, 26)";
         if (label) label.textContent = 'CAGR to use';
+        if (percentSign) percentSign.style.display = "";
         // leave the user's typed value alone
     } else {
         el.setAttribute('disabled', 'disabled');
@@ -308,9 +312,11 @@ function updateCagrField(predictionModel, currentBtcPrice) {
         if (label) label.textContent = 'Updated CAGR';
         if (predictionModel === "3") {
             el.value = "Variable";
+            if (percentSign) percentSign.style.display = "none";
         } else {
             const cagr = getAnnualCagr(predictionModel, currentBtcPrice);
-            el.value = cagr !== null ? (cagr * 100).toFixed(2) + "%" : "";
+            el.value = cagr !== null ? (cagr * 100).toFixed(2) : "";
+            if (percentSign) percentSign.style.display = "";
         }
     }
 }
@@ -326,7 +332,7 @@ function renderTable(rows, retirementAge, sim, btcStack, currentBtcPrice) {
     // Portfolio value at retirement
     const retSnap = sim.monthly[sim.retirementMonth] || sim.monthly[sim.monthly.length - 1];
     const rv = document.getElementById("retirement-value");
-    if (rv) rv.textContent = fmtUSD(retSnap ? retSnap.portfolioValue : 0);
+    if (rv) rv.textContent = Math.round(retSnap ? retSnap.portfolioValue : 0).toLocaleString();
 
     // Update the "at age N" label in the card
     const retAgeSpan = document.getElementsByName('retirement-age')[0];
