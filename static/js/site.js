@@ -319,6 +319,9 @@ function updateCagrField(predictionModel, currentBtcPrice) {
             if (percentSign) percentSign.style.display = "";
         }
     }
+    // el.value was just set programmatically (no 'input' event fires), so
+    // reposition the % sign directly.
+    if (percentSignRepositioners['updated-cagr']) percentSignRepositioners['updated-cagr']();
 }
 
 /* ----------------------------------------------------------------
@@ -607,3 +610,32 @@ formatFieldWithCommas('btc-stack', 8);
 formatFieldWithCommas('btc-price', 0);
 formatFieldWithCommas('monthly-expenses', 0);
 formatFieldWithCommas('monthly-purchase', 0);
+
+// Keep a % suffix glued to the end of the typed text (instead of pinned to
+// the far right of the field), by measuring the rendered text width.
+const percentSignRepositioners = {};
+const percentMeasureCanvas = document.createElement('canvas');
+
+function attachPercentSign(inputId, signId) {
+    const input = document.getElementById(inputId);
+    const sign = document.getElementById(signId);
+    if (!input || !sign) return;
+
+    function reposition() {
+        const cs = window.getComputedStyle(input);
+        const ctx = percentMeasureCanvas.getContext('2d');
+        ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const textWidth = ctx.measureText(input.value).width;
+        const paddingLeft = parseFloat(cs.paddingLeft) || 0;
+        const maxLeft = input.offsetWidth - 24;
+        sign.style.left = Math.min(paddingLeft + textWidth + 2, maxLeft) + 'px';
+    }
+
+    input.addEventListener('input', reposition);
+    window.addEventListener('resize', reposition);
+    reposition();
+    percentSignRepositioners[inputId] = reposition;
+}
+
+attachPercentSign('annual-inflation', 'annual-inflation-percent-sign');
+attachPercentSign('updated-cagr', 'updated-cagr-percent-sign');

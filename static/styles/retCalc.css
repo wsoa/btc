@@ -103,12 +103,11 @@ input:disabled {
 
 .input-percent input {
     margin-top: 0;
-    padding-right: 32px;
 }
 
 .input-percent-sign {
     position: absolute;
-    right: 16px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     font-family: sans-serif;
